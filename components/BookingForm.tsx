@@ -20,15 +20,24 @@ function parseAmount(value: string): number {
 export default function BookingForm({
   properties,
   customers,
+  initialPropertyId,
+  initialCheckIn,
+  initialCheckOut,
 }: {
   properties: Property[];
   customers: Customer[];
+  /** Prefilled when arriving from a calendar selection. */
+  initialPropertyId?: string;
+  initialCheckIn?: string;
+  initialCheckOut?: string;
 }) {
   const [state, formAction, pending] = useActionState(createBooking, INITIAL);
 
-  const [propertyId, setPropertyId] = useState(properties[0]?.id ?? "");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  const [propertyId, setPropertyId] = useState(
+    initialPropertyId || properties[0]?.id || "",
+  );
+  const [checkIn, setCheckIn] = useState(initialCheckIn ?? "");
+  const [checkOut, setCheckOut] = useState(initialCheckOut ?? "");
   const [nightsOverride, setNightsOverride] = useState("");
   const [roomRevenue, setRoomRevenue] = useState("");
   const [fees, setFees] = useState("");

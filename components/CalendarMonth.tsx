@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { STATE_LABELS, STATE_STYLES, type DerivedState } from "@/lib/booking-state";
-import { formatDate } from "@/lib/dates";
+import { addDays, daysBetween, formatDate, formatRange } from "@/lib/dates";
 
 export type CalendarEntry = {
   date: string;
@@ -14,13 +14,16 @@ export type CalendarEntry = {
   isTurnaround: boolean;
 };
 
+export type CalendarProperty = { id: string; name: string; initial: string };
+export type CalendarEvent = { id: string; name: string };
+
 type Props = {
-  /** Every date shown in the grid, including the leading and trailing padding days. */
+  /** Every date in the grid, including the leading and trailing padding days. */
   grid: string[];
   month: string;
-  properties: { id: string; name: string }[];
+  properties: CalendarProperty[];
   entries: CalendarEntry[];
-  eventDays: Record<string, string>;
+  eventDays: Record<string, CalendarEvent>;
   propertyFilter: string;
 };
 
@@ -34,11 +37,11 @@ export default function CalendarMonth({
   eventDays,
   propertyFilter,
 }: Props) {
-  const [selected, setSelected] = useState<string | null>(null);
+  // First tap picks a day, a later tap extends it into a range.
+  const [start, setStart] = useState<string | null>(null);
+  const [end, setEnd] = useState<string | null>(null);
 
-  const shown = propertyFilter
-    ? properties.filter((p) => p.id === propertyFilter)
-    : properties;
+  const shown = propertyFilter ? properties.filter((p) => p.id === propertyFilter) : properties;
 
   const byDate = new Map<string, CalendarEntry[]>();
   for (const entry of entries) {
@@ -48,7 +51,30 @@ export default function CalendarMonth({
     byDate.set(entry.date, list);
   }
 
-  const selectedEntries = selected ? (byDate.get(selected) ?? []) : [];
+  function handleDay(date: string) {
+    if (!start || end) {
+      setStart(date);
+      setEnd(null);
+    } else if (date === start) {
+      setStart(null);
+    } else if (date < start) {
+      setStart(date);
+    } else {
+      setEnd(date);
+    }
+  }
+
+  const rangeEnd = end ?? start;
+  const inRange = (d: string) => Boolean(start && rangeEnd && d >= start && d <= rangeEnd);
+
+  // Selected boxes are nights, so check-out is the morning after the last one.
+  const checkIn = start ?? "";
+  const checkOut = rangeEnd ? addDays(rangeEnd, 1) : "";
+  const nights = start && rangeEnd ? daysBetween(start, checkOut) : 0;
+  const logHref = `/?from=${checkIn}&to=${checkOut}${propertyFilter ? `&property=${propertyFilter}` : ""}`;
+
+  const selectedEntries = start ? (byDate.get(start) ?? []) : [];
+  const selectedEvent = start ? eventDays[start] : undefined;
 
   return (
     <div>
@@ -65,16 +91,20 @@ export default function CalendarMonth({
         {grid.map((date) => {
           const inMonth = date.slice(0, 7) === month;
           const dayEntries = byDate.get(date) ?? [];
-          const eventName = eventDays[date];
-          const isSelected = selected === date;
+          const event = eventDays[date];
+          const selected = inRange(date);
 
           return (
             <button
               key={date}
               type="button"
-              onClick={() => setSelected(isSelected ? null : date)}
-              className={`min-h-[62px] p-1 text-left align-top transition sm:min-h-[86px] sm:p-2 ${
-                isSelected ? "bg-slate-100" : eventName ? "bg-sky-50" : "bg-white"
+              onClick={() => handleDay(date)}
+              className={`min-h-[78px] p-1 text-left align-top transition sm:min-h-[104px] sm:p-2 ${
+                selected
+                  ? "bg-slate-900/10 ring-1 ring-inset ring-slate-900"
+                  : event
+                    ? "bg-sky-50"
+                    : "bg-white"
               } ${inMonth ? "" : "opacity-40"}`}
             >
               <span
@@ -83,24 +113,33 @@ export default function CalendarMonth({
                 {Number(date.slice(8, 10))}
               </span>
 
-              {eventName ? (
+              {event ? (
                 <span className="mt-0.5 hidden truncate text-[10px] leading-tight text-sky-700 sm:block">
-                  {eventName}
+                  {event.name}
                 </span>
               ) : null}
 
+              {/* Fixed slots, one per condo, so a bar's row always means the same unit. */}
               <span className="mt-1 flex flex-col gap-0.5">
                 {shown.map((p) => {
                   const entry = dayEntries.find((e) => e.propertyId === p.id);
-                  if (!entry) return <span key={p.id} className="h-1.5 rounded-sm bg-transparent" />;
+                  if (!entry) {
+                    return <span key={p.id} className="h-3.5 rounded-sm border border-dashed border-slate-200" />;
+                  }
+                  const style = STATE_STYLES[entry.state];
                   return (
                     <span
                       key={p.id}
-                      title={`${p.name}: ${entry.customerName}`}
-                      className={`h-1.5 rounded-sm ${STATE_STYLES[entry.state].bar} ${
+                      title={`${p.name}: ${entry.customerName}${entry.isTurnaround ? " (turnaround)" : ""}`}
+                      className={`flex h-3.5 items-center gap-1 overflow-hidden rounded-sm px-1 text-[9px] font-bold leading-none ${style.bar} ${style.text} ${
                         entry.isTurnaround ? "opacity-40" : ""
                       }`}
-                    />
+                    >
+                      <span>{p.initial}</span>
+                      <span className="hidden truncate font-medium sm:inline">
+                        {entry.customerName}
+                      </span>
+                    </span>
                   );
                 })}
               </span>
@@ -110,6 +149,17 @@ export default function CalendarMonth({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
+        {shown.map((p) => (
+          <span key={p.id} className="inline-flex items-center gap-1.5">
+            <span className="inline-flex size-4 items-center justify-center rounded-sm bg-slate-200 text-[9px] font-bold text-slate-700">
+              {p.initial}
+            </span>
+            {p.name}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
         {(["hold", "committed", "booked", "confirmed"] as DerivedState[]).map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
             <span className={`h-2 w-4 rounded-sm ${STATE_STYLES[s].bar}`} />
@@ -126,16 +176,39 @@ export default function CalendarMonth({
         </span>
       </div>
 
-      {selected ? (
+      {start ? (
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-sm font-semibold text-slate-900">{formatDate(selected)}</p>
-          {eventDays[selected] ? (
-            <p className="text-sm text-sky-700">{eventDays[selected]}</p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {end ? formatRange(start, rangeEnd as string) : formatDate(start)}
+              </p>
+              {selectedEvent ? (
+                <Link
+                  href={`/events/${selectedEvent.id}`}
+                  className="text-sm text-sky-700 hover:underline"
+                >
+                  {selectedEvent.name}
+                </Link>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setStart(null);
+                setEnd(null);
+              }}
+              className="btn-quiet shrink-0"
+            >
+              Clear
+            </button>
+          </div>
+
+          {selectedEntries.length === 0 && !end ? (
+            <p className="mt-2 text-sm text-slate-500">All condos open.</p>
           ) : null}
 
-          {selectedEntries.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500">All condos open.</p>
-          ) : (
+          {!end && selectedEntries.length > 0 ? (
             <ul className="mt-2 divide-y divide-slate-100">
               {selectedEntries.map((entry) => {
                 const property = properties.find((p) => p.id === entry.propertyId);
@@ -152,10 +225,22 @@ export default function CalendarMonth({
                 );
               })}
             </ul>
-          )}
+          ) : null}
+
+          <div className="mt-3 border-t border-slate-100 pt-3">
+            <Link href={logHref} className="btn-primary inline-block text-center">
+              Log a stay, {nights} {nights === 1 ? "night" : "nights"}
+            </Link>
+            <p className="mt-1.5 text-xs text-slate-500">
+              Check in {formatDate(checkIn)}, check out {formatDate(checkOut)}.
+              {end ? "" : " Tap a later day to extend."}
+            </p>
+          </div>
         </div>
       ) : (
-        <p className="mt-4 text-sm text-slate-500">Tap a day to see what is on it.</p>
+        <p className="mt-4 text-sm text-slate-500">
+          Tap a day to see what is on it. Tap a second day to select a range and log a stay.
+        </p>
       )}
     </div>
   );

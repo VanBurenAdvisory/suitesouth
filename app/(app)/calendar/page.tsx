@@ -1,5 +1,5 @@
 import Link from "next/link";
-import CalendarMonth, { type CalendarEntry } from "@/components/CalendarMonth";
+import CalendarMonth, { type CalendarEntry, type CalendarEvent } from "@/components/CalendarMonth";
 import { calendarDays } from "@/lib/availability";
 import { addDays, eachDay, todayLocal } from "@/lib/dates";
 import { listEvents } from "@/lib/db/events";
@@ -51,14 +51,14 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
     for (const day of days) entries.push({ ...day, propertyId });
   }
 
-  const eventDays: Record<string, string> = {};
+  const eventDays: Record<string, CalendarEvent> = {};
   for (const e of events) {
     if (e.endDate < gridStart || e.startDate > gridEnd) continue;
     for (const date of eachDay(
       e.startDate < gridStart ? gridStart : e.startDate,
       e.endDate > gridEnd ? gridEnd : e.endDate,
     )) {
-      eventDays[date] = e.name;
+      eventDays[date] = { id: e.id, name: e.name };
     }
   }
 
@@ -109,7 +109,12 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
       <CalendarMonth
         grid={eachDay(gridStart, gridEnd)}
         month={month}
-        properties={properties.map((p) => ({ id: p.id, name: p.name }))}
+        properties={properties.map((p) => ({
+          id: p.id,
+          name: p.name,
+          // "The Stacy" -> S, so a bar is identifiable at 390px.
+          initial: p.name.replace(/^The\s+/i, "").charAt(0).toUpperCase(),
+        }))}
         entries={entries}
         eventDays={eventDays}
         propertyFilter={propertyFilter}

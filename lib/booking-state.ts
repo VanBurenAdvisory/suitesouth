@@ -73,13 +73,36 @@ export const STATE_LABELS: Record<DerivedState, string> = {
   cancelled: "Cancelled",
 };
 
-/** Shared across the calendar, the stays list, and the availability screen. */
-export const STATE_STYLES: Record<DerivedState, { chip: string; bar: string }> = {
-  hold: { chip: "border-slate-200 bg-slate-100 text-slate-600", bar: "bg-slate-300" },
-  committed: { chip: "border-amber-200 bg-amber-50 text-amber-900", bar: "bg-amber-400" },
-  booked: { chip: "border-sky-200 bg-sky-50 text-sky-800", bar: "bg-sky-500" },
-  confirmed: { chip: "border-emerald-200 bg-emerald-50 text-emerald-800", bar: "bg-emerald-500" },
-  cancelled: { chip: "border-slate-200 bg-white text-slate-400 line-through", bar: "bg-slate-200" },
+/**
+ * Shared across the calendar, the stays list, and the availability screen.
+ * `text` is the readable foreground for a label sitting on top of `bar`.
+ */
+export const STATE_STYLES: Record<DerivedState, { chip: string; bar: string; text: string }> = {
+  hold: {
+    chip: "border-slate-200 bg-slate-100 text-slate-600",
+    bar: "bg-slate-300",
+    text: "text-slate-700",
+  },
+  committed: {
+    chip: "border-amber-200 bg-amber-50 text-amber-900",
+    bar: "bg-amber-400",
+    text: "text-amber-950",
+  },
+  booked: {
+    chip: "border-sky-200 bg-sky-50 text-sky-800",
+    bar: "bg-sky-500",
+    text: "text-white",
+  },
+  confirmed: {
+    chip: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    bar: "bg-emerald-600",
+    text: "text-white",
+  },
+  cancelled: {
+    chip: "border-slate-200 bg-white text-slate-400 line-through",
+    bar: "bg-slate-200",
+    text: "text-slate-500",
+  },
 };
 
 export const CONTRACT_LABELS: Record<ContractStatus, string> = {
