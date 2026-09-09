@@ -3,6 +3,7 @@ const MESSAGES: Record<string, string> = {
   dates: "Both a check-in and a check-out date are required.",
   order: "Check-out has to be after check-in.",
   duplicate: "An event with that name and year already exists. Change the name or the year.",
+  has_bookings: "That customer has stays logged, so they cannot be deleted.",
 };
 
 /** Renders nothing when there is no error code, so it is safe to always mount. */

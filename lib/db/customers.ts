@@ -94,3 +94,17 @@ export async function findPossibleDuplicates(
   )) as Row[];
   return rows.map(toCustomer);
 }
+
+export async function countBookingsForCustomer(id: string): Promise<number> {
+  const sql = connection();
+  const rows = (await sql`
+    select count(*)::int as n from bookings where customer_id = ${id}
+  `) as Row[];
+  return Number(rows[0]?.n ?? 0);
+}
+
+/** Only for customers with no bookings. Callers must check first. */
+export async function deleteCustomer(id: string): Promise<void> {
+  const sql = connection();
+  await sql`delete from customers where id = ${id}`;
+}

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import DeleteCustomerButton from "@/components/DeleteCustomerButton";
+import FormError from "@/components/FormError";
 import { notFound } from "next/navigation";
 import BookingsTable from "@/components/BookingsTable";
 import { getCustomer } from "@/lib/db/customers";
@@ -10,10 +12,14 @@ export const dynamic = "force-dynamic";
 
 export default async function CustomerDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const errorCode = Array.isArray(sp.error) ? sp.error[0] : sp.error;
   const [customer, bookings, settings] = await Promise.all([
     getCustomer(id),
     listBookings({ customerId: id }),
@@ -31,6 +37,10 @@ export default async function CustomerDetailPage({
       <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
         {customer.firstName ? `${customer.firstName} ${customer.lastName}` : customer.lastName}
       </h2>
+
+      <div className="mt-4">
+        <FormError code={errorCode} />
+      </div>
 
       <form
         action={saveCustomer}
@@ -125,6 +135,16 @@ export default async function CustomerDetailPage({
           emptyMessage="No stays logged for this customer yet."
         />
       </section>
+
+      <div className="mt-6">
+        <DeleteCustomerButton
+          customerId={customer.id}
+          customerName={
+            customer.firstName ? `${customer.firstName} ${customer.lastName}` : customer.lastName
+          }
+          bookingCount={bookings.length}
+        />
+      </div>
     </main>
   );
 }

@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
-import { createCustomer, findPossibleDuplicates, updateCustomer } from "@/lib/db/customers";
+import {
+  countBookingsForCustomer,
+  createCustomer,
+  deleteCustomer,
+  findPossibleDuplicates,
+  updateCustomer,
+} from "@/lib/db/customers";
 
 const text = (formData: FormData, name: string) => String(formData.get(name) ?? "").trim();
 
@@ -47,6 +53,27 @@ export async function addCustomer(
   revalidatePath("/customers");
   revalidatePath("/");
   return { error: null, duplicates: [] };
+}
+
+/**
+ * Only for customers who should not exist, such as a duplicate or a typo.
+ * Anyone with booking history stays: their name is on those records, and
+ * removing them would orphan the history rather than tidy it.
+ */
+export async function removeCustomer(formData: FormData): Promise<void> {
+  await requireAuth();
+  const id = text(formData, "id");
+  if (!id) return;
+
+  // Re-checked here rather than trusting the page, which may be stale.
+  if ((await countBookingsForCustomer(id)) > 0) {
+    redirect(`/customers/${id}?error=has_bookings`);
+  }
+
+  await deleteCustomer(id);
+  revalidatePath("/customers");
+  revalidatePath("/");
+  redirect("/customers");
 }
 
 export async function saveCustomer(formData: FormData): Promise<void> {
