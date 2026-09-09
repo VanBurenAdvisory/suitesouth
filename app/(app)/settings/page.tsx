@@ -70,7 +70,7 @@ export default async function SettingsPage() {
 
         <div className="mt-3 space-y-3">
           {properties.map((p) => (
-            <form key={p.id} action={savePropertyTurnaround} className="flex items-end gap-2">
+            <form key={`${p.id}-${p.turnaroundDays}`} action={savePropertyTurnaround} className="flex items-end gap-2">
               <input type="hidden" name="id" value={p.id} />
               <div className="min-w-0 flex-1">
                 <label className="label" htmlFor={`turnaround-${p.id}`}>
@@ -95,6 +95,7 @@ export default async function SettingsPage() {
       </section>
 
       <form
+        key={JSON.stringify(settings)}
         action={saveSettings}
         className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
       >

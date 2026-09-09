@@ -117,7 +117,7 @@ export default async function BookingDetailPage({
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Status</h3>
 
-          <form action={saveContractStatus} className="mt-3">
+          <form key={`contract-${booking.updatedAt}`} action={saveContractStatus} className="mt-3">
             <input type="hidden" name="id" value={booking.id} />
             <label className="label" htmlFor="contract_status">
               Contract
@@ -150,7 +150,7 @@ export default async function BookingDetailPage({
             </div>
           </form>
 
-          <form action={saveInvoiceStatus} className="mt-4">
+          <form key={`invoice-${booking.updatedAt}`} action={saveInvoiceStatus} className="mt-4">
             <input type="hidden" name="id" value={booking.id} />
             <label className="label" htmlFor="invoice_status">
               Invoice
@@ -241,7 +241,7 @@ export default async function BookingDetailPage({
         {/* Editable booking fields */}
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Details</h3>
-          <form action={saveBookingDetails} className="mt-3 space-y-3">
+          <form key={`details-${booking.updatedAt}`} action={saveBookingDetails} className="mt-3 space-y-3">
             <input type="hidden" name="id" value={booking.id} />
 
             <div>

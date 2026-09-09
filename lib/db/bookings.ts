@@ -31,7 +31,7 @@ const COLUMNS = `
   b.invoice_status, b.invoice_sent_at::text as invoice_sent_at,
   b.deposit_received_at::text as deposit_received_at,
   b.paid_in_full_at::text as paid_in_full_at,
-  b.notes, b.created_at::text as created_at
+  b.notes, b.created_at::text as created_at, b.updated_at::text as updated_at
 `;
 
 const FROM = `
@@ -77,6 +77,7 @@ function toBooking(r: Row): Booking {
     paidInFullAt: nullableStr(r.paid_in_full_at),
     notes: nullableStr(r.notes),
     createdAt: str(r.created_at),
+    updatedAt: str(r.updated_at),
   };
 }
 

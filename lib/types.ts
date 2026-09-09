@@ -99,6 +99,8 @@ export type Booking = {
   paidInFullAt: string | null;
   notes: string | null;
   createdAt: string;
+  /** Bumped on every save; used to remount edit forms with fresh defaults. */
+  updatedAt: string;
 };
 
 export type NewBooking = {
