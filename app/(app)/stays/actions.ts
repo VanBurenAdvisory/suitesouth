@@ -47,21 +47,24 @@ export async function saveBookingDetails(formData: FormData): Promise<void> {
   refresh(id);
 }
 
-export async function saveContractStatus(formData: FormData): Promise<void> {
+/**
+ * Both tracks save together. They used to have a Save each, so editing both and
+ * pressing one silently discarded the other.
+ */
+export async function saveStatus(formData: FormData): Promise<void> {
   await requireAuth();
   const id = text(formData, "id");
-  const status = text(formData, "contract_status");
-  if (!id || !CONTRACT_STATUSES.includes(status as never)) return;
-  await setContractStatus(id, status as (typeof CONTRACT_STATUSES)[number]);
-  refresh(id);
-}
+  if (!id) return;
 
-export async function saveInvoiceStatus(formData: FormData): Promise<void> {
-  await requireAuth();
-  const id = text(formData, "id");
-  const status = text(formData, "invoice_status");
-  if (!id || !INVOICE_STATUSES.includes(status as never)) return;
-  await setInvoiceStatus(id, status as (typeof INVOICE_STATUSES)[number]);
+  const contract = text(formData, "contract_status");
+  const invoice = text(formData, "invoice_status");
+
+  if (CONTRACT_STATUSES.includes(contract as never)) {
+    await setContractStatus(id, contract as (typeof CONTRACT_STATUSES)[number]);
+  }
+  if (INVOICE_STATUSES.includes(invoice as never)) {
+    await setInvoiceStatus(id, invoice as (typeof INVOICE_STATUSES)[number]);
+  }
   refresh(id);
 }
 

@@ -116,6 +116,8 @@ export type NewBooking = {
   taxAmount: number | null;
   amountReceived: number;
   notes: string | null;
+  /** Shortcut for the common case: contract signed and paid in full at entry. */
+  confirmed: boolean;
 };
 
 /** Just enough of a booking to compute blocking, for calendars and availability. */

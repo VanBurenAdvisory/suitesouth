@@ -156,6 +156,8 @@ export async function createBooking(_prev: FormState, formData: FormData): Promi
       taxAmount,
       amountReceived,
       notes,
+      // One tick at entry instead of two edits and two saves afterwards.
+      confirmed: text(formData, "confirmed") === "1",
     });
   } catch (error) {
     console.error("createBooking failed", error);

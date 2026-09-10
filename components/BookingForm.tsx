@@ -45,6 +45,7 @@ export default function BookingForm({
   const [amountReceived, setAmountReceived] = useState("");
   const [paidDate, setPaidDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
 
   const computedNights = nightsBetween(checkIn, checkOut);
   const nights = nightsOverride === "" ? computedNights : Math.max(0, Number(nightsOverride) || 0);
@@ -75,6 +76,7 @@ export default function BookingForm({
       setAmountReceived("");
       setPaidDate("");
       setNotes("");
+      setConfirmed(false);
     }
   }, [state]);
 
@@ -244,6 +246,28 @@ export default function BookingForm({
             />
           </div>
         </div>
+
+        {/* The common case: a returning guest who has already paid. */}
+        <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <input
+            type="checkbox"
+            name="confirmed"
+            value="1"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+            className="mt-0.5 size-5 shrink-0 rounded border-slate-300"
+          />
+          <span className="text-sm font-medium text-slate-800">
+            Confirmed
+            <span className="block text-xs font-normal text-slate-500">
+              Contract signed and paid in full
+              {confirmed && result.amountDue > 0
+                ? `, recording ${money(result.amountDue)} received`
+                : ""}
+              .
+            </span>
+          </span>
+        </label>
 
         <details className="rounded-xl border border-slate-200 bg-white px-4 py-3">
           <summary className="cursor-pointer text-sm font-medium text-slate-600">

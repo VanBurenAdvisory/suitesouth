@@ -183,6 +183,16 @@ export async function insertBooking(input: NewBooking): Promise<string> {
     taxAmount: input.taxAmount,
   });
 
+  // Confirming at entry stamps both tracks now, the same shape the detail view
+  // and a future email parser would write.
+  const stamp = input.confirmed ? new Date().toISOString() : null;
+  const contractStatus = input.confirmed ? "signed" : "not_sent";
+  const invoiceStatus = input.confirmed ? "paid_in_full" : "not_sent";
+
+  // Confirmed with no amount typed means the whole thing was paid.
+  const received =
+    input.confirmed && input.amountReceived === 0 ? c.amountDue : input.amountReceived;
+
   // Id generated here so the booking and its first payment commit together.
   const id = randomUUID();
   const statements = [
@@ -191,21 +201,25 @@ export async function insertBooking(input: NewBooking): Promise<string> {
         id, property_id, customer_id, event_id, check_in, check_out,
         nightly_rate, nights, turnaround_days, fees, subtotal,
         owner_share_pct, commission_pct, fee_treatment,
-        manager_commission, owner_due, coowner_due, tax_amount, amount_due, notes
+        manager_commission, owner_due, coowner_due, tax_amount, amount_due, notes,
+        contract_status, contract_sent_at, contract_signed_at,
+        invoice_status, invoice_sent_at, deposit_received_at, paid_in_full_at
       ) values (
         ${id}, ${input.propertyId}, ${input.customerId}, ${input.eventId},
         ${input.checkIn}, ${input.checkOut},
         ${c.nightlyRate}, ${input.nights}, ${turnaroundDays}, ${input.fees}, ${c.subtotal},
         ${terms.ownerSharePct}, ${terms.commissionPct}, ${terms.feeTreatment},
         ${c.managerCommission}, ${c.ownerDue}, ${c.coownerDue},
-        ${input.taxAmount}, ${c.amountDue}, ${input.notes}
+        ${input.taxAmount}, ${c.amountDue}, ${input.notes},
+        ${contractStatus}, ${stamp}, ${stamp},
+        ${invoiceStatus}, ${stamp}, ${stamp}, ${stamp}
       )
     `,
   ];
 
-  if (input.amountReceived > 0) {
+  if (received > 0) {
     statements.push(sql`
-      insert into payments (booking_id, amount) values (${id}, ${input.amountReceived})
+      insert into payments (booking_id, amount) values (${id}, ${received})
     `);
   }
 

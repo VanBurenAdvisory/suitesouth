@@ -2,17 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DeleteStayButton from "@/components/DeleteStayButton";
 import StateChip from "@/components/StateChip";
+import StatusFields from "@/components/StatusFields";
 import { money } from "@/lib/calc";
 import { formatDate, formatRange, todayLocal } from "@/lib/dates";
-import {
-  CONTRACT_LABELS,
-  CONTRACT_STATUSES,
-  INVOICE_LABELS,
-  INVOICE_STATUSES,
-  LIFECYCLES,
-  deriveState,
-  isStaleHold,
-} from "@/lib/booking-state";
+import { LIFECYCLES, deriveState, isStaleHold } from "@/lib/booking-state";
 import { getBooking, listPayments } from "@/lib/db/bookings";
 import { listEvents } from "@/lib/db/events";
 import { loadSettings } from "@/lib/db/settings";
@@ -20,8 +13,7 @@ import {
   recordPayment,
   removePayment,
   saveBookingDetails,
-  saveContractStatus,
-  saveInvoiceStatus,
+  saveStatus,
 } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -117,71 +109,26 @@ export default async function BookingDetailPage({
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Status</h3>
 
-          <form key={`contract-${booking.updatedAt}`} action={saveContractStatus} className="mt-3">
+          <form key={`status-${booking.updatedAt}`} action={saveStatus}>
             <input type="hidden" name="id" value={booking.id} />
-            <label className="label" htmlFor="contract_status">
-              Contract
-              {booking.contractSignedAt ? (
-                <span className="ml-1.5 text-xs font-normal text-slate-400">
-                  signed {formatDate(booking.contractSignedAt.slice(0, 10))}
-                </span>
-              ) : booking.contractSentAt ? (
-                <span className="ml-1.5 text-xs font-normal text-slate-400">
-                  sent {formatDate(booking.contractSentAt.slice(0, 10))}
-                </span>
-              ) : null}
-            </label>
-            <div className="flex gap-2">
-              <select
-                id="contract_status"
-                name="contract_status"
-                defaultValue={booking.contractStatus}
-                className="field"
-              >
-                {CONTRACT_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {CONTRACT_LABELS[s]}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="btn-quiet shrink-0 px-4">
-                Save
-              </button>
-            </div>
+            <StatusFields
+              contractStatus={booking.contractStatus}
+              invoiceStatus={booking.invoiceStatus}
+            />
           </form>
 
-          <form key={`invoice-${booking.updatedAt}`} action={saveInvoiceStatus} className="mt-4">
-            <input type="hidden" name="id" value={booking.id} />
-            <label className="label" htmlFor="invoice_status">
-              Invoice
-              {booking.paidInFullAt ? (
-                <span className="ml-1.5 text-xs font-normal text-slate-400">
-                  paid {formatDate(booking.paidInFullAt.slice(0, 10))}
-                </span>
-              ) : booking.depositReceivedAt ? (
-                <span className="ml-1.5 text-xs font-normal text-slate-400">
-                  deposit {formatDate(booking.depositReceivedAt.slice(0, 10))}
-                </span>
-              ) : null}
-            </label>
-            <div className="flex gap-2">
-              <select
-                id="invoice_status"
-                name="invoice_status"
-                defaultValue={booking.invoiceStatus}
-                className="field"
-              >
-                {INVOICE_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {INVOICE_LABELS[s]}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="btn-quiet shrink-0 px-4">
-                Save
-              </button>
-            </div>
-          </form>
+          {booking.contractSignedAt || booking.depositReceivedAt || booking.paidInFullAt ? (
+            <p className="mt-3 text-xs text-slate-400">
+              {booking.contractSignedAt
+                ? `Signed ${formatDate(booking.contractSignedAt.slice(0, 10))}. `
+                : ""}
+              {booking.paidInFullAt
+                ? `Paid ${formatDate(booking.paidInFullAt.slice(0, 10))}.`
+                : booking.depositReceivedAt
+                  ? `Deposit ${formatDate(booking.depositReceivedAt.slice(0, 10))}.`
+                  : ""}
+            </p>
+          ) : null}
         </section>
 
         {/* Payments */}
