@@ -60,7 +60,15 @@ export default async function StaysPage({ searchParams }: { searchParams: Search
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">Stays</h2>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-slate-900">
+          Stays
+          <span className="ml-2 text-sm font-normal text-slate-500">{bookings.length}</span>
+        </h2>
+        <Link href="/" className="btn-add">
+          Add
+        </Link>
+      </div>
 
       <details open={hasFilters} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <summary className="disclosure">

@@ -52,15 +52,27 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
     .filter(Boolean)
     .join(" ");
 
+  // Opening the form is a URL, so it survives a reload and keeps the filters.
+  const addParams = new URLSearchParams();
+  if (year !== undefined) addParams.set("year", String(year));
+  if (month !== undefined) addParams.set("month", String(month));
+  addParams.set("add", "1");
+  const addHref = `/events?${addParams.toString()}#add`;
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">
-        Events
-        <span className="ml-2 text-sm font-normal text-slate-500">
-          {events.length}
-          {scope ? ` in ${scope}` : ""}
-        </span>
-      </h2>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-slate-900">
+          Events
+          <span className="ml-2 text-sm font-normal text-slate-500">
+            {events.length}
+            {scope ? ` in ${scope}` : ""}
+          </span>
+        </h2>
+        <a href={addHref} className="btn-add">
+          Add
+        </a>
+      </div>
 
       <FormError code={one(sp.error) || undefined} />
 
@@ -140,7 +152,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
         ) : null}
       </ul>
 
-      <details className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <details
+        id="add"
+        open={one(sp.add) === "1"}
+        className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+      >
         <summary className="disclosure">Add an event</summary>
         <form action={addEvent} className="mt-3">
 

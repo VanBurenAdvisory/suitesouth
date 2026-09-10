@@ -13,12 +13,23 @@ export default async function CustomersPage({ searchParams }: { searchParams: Se
   const query = one(sp.q);
   const customers = await listCustomers(query);
 
+  // Opening the form is a URL, so it survives a reload and keeps the search.
+  const addParams = new URLSearchParams();
+  if (query) addParams.set("q", query);
+  addParams.set("add", "1");
+  const addHref = `/customers?${addParams.toString()}#add`;
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">
-        Customers
-        <span className="ml-2 text-sm font-normal text-slate-500">{customers.length}</span>
-      </h2>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-slate-900">
+          Customers
+          <span className="ml-2 text-sm font-normal text-slate-500">{customers.length}</span>
+        </h2>
+        <a href={addHref} className="btn-add">
+          Add
+        </a>
+      </div>
 
       <form method="get" className="flex gap-2">
         <input
@@ -55,7 +66,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Se
       </ul>
 
       <div className="mt-6">
-        <NewCustomerForm />
+        <NewCustomerForm defaultOpen={one(sp.add) === "1"} />
       </div>
     </main>
   );

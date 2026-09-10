@@ -40,6 +40,12 @@ body {
            transition hover:bg-slate-50;
   }
 
+  /* Compact primary action, for a header row rather than a full-width form. */
+  .btn-add {
+    @apply shrink-0 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white
+           transition hover:bg-slate-800 active:bg-slate-950;
+  }
+
   /* Collapsible section header used to keep long forms off the first screen. */
   .disclosure {
     @apply cursor-pointer list-none text-sm font-semibold uppercase tracking-wide text-slate-500

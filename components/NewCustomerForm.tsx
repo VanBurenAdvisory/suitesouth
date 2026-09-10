@@ -5,7 +5,7 @@ import { addCustomer, type CustomerFormState } from "@/app/(app)/customers/actio
 
 const INITIAL: CustomerFormState = { error: null, duplicates: [] };
 
-export default function NewCustomerForm() {
+export default function NewCustomerForm({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [state, formAction, pending] = useActionState(addCustomer, INITIAL);
 
   // Collapsed by default so the list is what you land on, but forced open when
@@ -13,7 +13,11 @@ export default function NewCustomerForm() {
   const hasFeedback = Boolean(state.error) || state.duplicates.length > 0;
 
   return (
-    <details open={hasFeedback} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <details
+      id="add"
+      open={defaultOpen || hasFeedback}
+      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+    >
       <summary className="disclosure">Add a customer</summary>
       <form action={formAction} className="mt-3">
       {state.error ? (
