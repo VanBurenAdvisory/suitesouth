@@ -7,12 +7,12 @@
  */
 
 export type Lifecycle = "hold" | "active" | "cancelled";
-export type ContractStatus = "not_sent" | "sent" | "signed";
+export type ContractStatus = "not_sent" | "sent" | "signed" | "standing";
 export type InvoiceStatus = "not_sent" | "sent" | "deposit_received" | "paid_in_full";
 export type DerivedState = "hold" | "committed" | "booked" | "confirmed" | "cancelled";
 
 export const LIFECYCLES: Lifecycle[] = ["hold", "active", "cancelled"];
-export const CONTRACT_STATUSES: ContractStatus[] = ["not_sent", "sent", "signed"];
+export const CONTRACT_STATUSES: ContractStatus[] = ["not_sent", "sent", "signed", "standing"];
 export const INVOICE_STATUSES: InvoiceStatus[] = [
   "not_sent",
   "sent",
@@ -44,11 +44,13 @@ export function deriveState(b: StateInput, opts: StateOptions = {}): DerivedStat
   if (b.lifecycle === "cancelled") return "cancelled";
 
   const requireSignature = opts.requireSignatureForBooked ?? true;
-  const paperworkOk = requireSignature ? b.contractStatus === "signed" : true;
+  // A standing agreement covers the stay as fully as a fresh signature does.
+  const covered = b.contractStatus === "signed" || b.contractStatus === "standing";
+  const paperworkOk = requireSignature ? covered : true;
 
   if (paperworkOk && b.invoiceStatus === "paid_in_full") return "confirmed";
   if (paperworkOk && b.invoiceStatus === "deposit_received") return "booked";
-  if (b.contractStatus === "sent" || b.contractStatus === "signed") return "committed";
+  if (b.contractStatus !== "not_sent") return "committed";
   return "hold";
 }
 
@@ -109,6 +111,7 @@ export const CONTRACT_LABELS: Record<ContractStatus, string> = {
   not_sent: "Not sent",
   sent: "Sent",
   signed: "Signed",
+  standing: "Standing agreement",
 };
 
 export const INVOICE_LABELS: Record<InvoiceStatus, string> = {
@@ -127,6 +130,8 @@ export const CONTRACT_TIMESTAMP: Record<ContractStatus, string | null> = {
   not_sent: null,
   sent: "contract_sent_at",
   signed: "contract_signed_at",
+  // A standing agreement was not signed for this stay, so nothing is stamped.
+  standing: null,
 };
 
 export const INVOICE_TIMESTAMP: Record<InvoiceStatus, string | null> = {

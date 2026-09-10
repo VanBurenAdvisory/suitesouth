@@ -183,10 +183,18 @@ export async function insertBooking(input: NewBooking): Promise<string> {
     taxAmount: input.taxAmount,
   });
 
+  // A customer on a standing agreement needs no contract for this stay, and
+  // recording one as signed would assert a signature that never happened.
+  const customers = (await sql`
+    select has_standing_contract from customers where id = ${input.customerId}
+  `) as Row[];
+  const standing = Boolean(customers[0]?.has_standing_contract);
+
   // Confirming at entry stamps both tracks now, the same shape the detail view
   // and a future email parser would write.
   const stamp = input.confirmed ? new Date().toISOString() : null;
-  const contractStatus = input.confirmed ? "signed" : "not_sent";
+  const contractStatus = standing ? "standing" : input.confirmed ? "signed" : "not_sent";
+  const contractStamp = standing ? null : stamp;
   const invoiceStatus = input.confirmed ? "paid_in_full" : "not_sent";
 
   // Confirmed with no amount typed means the whole thing was paid.
@@ -211,7 +219,7 @@ export async function insertBooking(input: NewBooking): Promise<string> {
         ${terms.ownerSharePct}, ${terms.commissionPct}, ${terms.feeTreatment},
         ${c.managerCommission}, ${c.ownerDue}, ${c.coownerDue},
         ${input.taxAmount}, ${c.amountDue}, ${input.notes},
-        ${contractStatus}, ${stamp}, ${stamp},
+        ${contractStatus}, ${contractStamp}, ${contractStamp},
         ${invoiceStatus}, ${stamp}, ${stamp}, ${stamp}
       )
     `,
@@ -260,6 +268,11 @@ export async function setContractStatus(id: string, status: ContractStatus): Pro
     await sql`update bookings set contract_status = 'signed',
               contract_sent_at = coalesce(contract_sent_at, now()),
               contract_signed_at = coalesce(contract_signed_at, now()), updated_at = now()
+              where id = ${id}`;
+  } else if (status === "standing") {
+    // Nothing was sent or signed for this stay, so nothing gets stamped.
+    await sql`update bookings set contract_status = 'standing',
+              contract_sent_at = null, contract_signed_at = null, updated_at = now()
               where id = ${id}`;
   } else {
     await sql`update bookings set contract_status = 'not_sent',

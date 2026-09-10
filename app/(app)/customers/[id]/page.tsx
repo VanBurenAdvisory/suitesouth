@@ -43,6 +43,7 @@ export default async function CustomerDetailPage({
       </div>
 
       <form
+        key={customer.updatedAt}
         action={saveCustomer}
         className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
       >
@@ -105,6 +106,22 @@ export default async function CustomerDetailPage({
               defaultValue={customer.address ?? ""}
               className="field"
             />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <input
+                type="checkbox"
+                name="has_standing_contract"
+                defaultChecked={customer.hasStandingContract}
+                className="mt-0.5 size-5 shrink-0 rounded border-slate-300"
+              />
+              <span className="text-sm font-medium text-slate-800">
+                Standing contract
+                <span className="block text-xs font-normal text-slate-500">
+                  Covered by a perpetual agreement, so new stays need no contract signed.
+                </span>
+              </span>
+            </label>
           </div>
           <div className="sm:col-span-2">
             <label className="label" htmlFor="notes">

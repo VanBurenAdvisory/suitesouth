@@ -36,7 +36,16 @@ export default function CustomerPicker({ customers }: { customers: Customer[] })
       <div>
         <span className="label">Guest</span>
         <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3">
-          <span className="text-lg font-medium text-slate-900">{fullName(selected)}</span>
+          <span className="min-w-0">
+            <span className="block truncate text-lg font-medium text-slate-900">
+              {fullName(selected)}
+            </span>
+            {selected.hasStandingContract ? (
+              <span className="block text-xs text-slate-500">
+                Standing contract, nothing to sign
+              </span>
+            ) : null}
+          </span>
           <button
             type="button"
             onClick={() => {

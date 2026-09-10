@@ -69,7 +69,7 @@ console.log("\nDerived state");
 {
   const b = (
     lifecycle: "hold" | "active" | "cancelled",
-    contractStatus: "not_sent" | "sent" | "signed",
+    contractStatus: "not_sent" | "sent" | "signed" | "standing",
     invoiceStatus: "not_sent" | "sent" | "deposit_received" | "paid_in_full",
   ) => ({ lifecycle, contractStatus, invoiceStatus });
 
@@ -83,6 +83,16 @@ console.log("\nDerived state");
   console.log("  gap cases, money ahead of paperwork");
   eq("deposit but contract only sent", deriveState(b("active", "sent", "deposit_received")), "committed");
   eq("paid in full but nothing sent", deriveState(b("active", "not_sent", "paid_in_full")), "hold");
+
+  console.log("  standing agreement counts as covered");
+  eq("standing + paid in full", deriveState(b("active", "standing", "paid_in_full")), "confirmed");
+  eq("standing + deposit", deriveState(b("active", "standing", "deposit_received")), "booked");
+  eq("standing, no money yet", deriveState(b("active", "standing", "not_sent")), "committed");
+  eq(
+    "standing is still cancellable",
+    deriveState(b("cancelled", "standing", "paid_in_full")),
+    "cancelled",
+  );
 
   console.log("  with require_signature_for_booked turned off");
   const loose = { requireSignatureForBooked: false };

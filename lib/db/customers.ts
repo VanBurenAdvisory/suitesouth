@@ -13,12 +13,14 @@ function toCustomer(r: Row): Customer {
     email: nullableStr(r.email),
     address: nullableStr(r.address),
     notes: nullableStr(r.notes),
+    hasStandingContract: Boolean(r.has_standing_contract),
     createdAt: str(r.created_at),
     updatedAt: str(r.updated_at),
   };
 }
 
 const COLUMNS = `id, first_name, last_name, phone, email, address, notes,
+                 has_standing_contract,
                  created_at::text as created_at, updated_at::text as updated_at`;
 
 export async function listCustomers(search?: string): Promise<Customer[]> {
@@ -49,9 +51,11 @@ export async function getCustomer(id: string): Promise<Customer | null> {
 export async function createCustomer(input: CustomerInput): Promise<string> {
   const sql = connection();
   const rows = (await sql`
-    insert into customers (first_name, last_name, phone, email, address, notes)
+    insert into customers (first_name, last_name, phone, email, address, notes,
+                           has_standing_contract)
     values (${input.firstName}, ${input.lastName}, ${input.phone},
-            ${input.email}, ${input.address}, ${input.notes})
+            ${input.email}, ${input.address}, ${input.notes},
+            ${input.hasStandingContract})
     returning id
   `) as Row[];
   return str(rows[0].id);
@@ -67,6 +71,7 @@ export async function updateCustomer(id: string, input: CustomerInput): Promise<
         email      = ${input.email},
         address    = ${input.address},
         notes      = ${input.notes},
+        has_standing_contract = ${input.hasStandingContract},
         updated_at = now()
     where id = ${id}
   `;

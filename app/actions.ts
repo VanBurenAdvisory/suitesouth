@@ -132,6 +132,8 @@ export async function createBooking(_prev: FormState, formData: FormData): Promi
         email: null,
         address: null,
         notes: null,
+        // A brand-new guest has no standing agreement; set it on their record later.
+        hasStandingContract: false,
       });
     } catch (error) {
       console.error("createCustomer failed", error);

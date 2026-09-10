@@ -18,6 +18,8 @@ export type Customer = {
   email: string | null;
   address: string | null;
   notes: string | null;
+  /** Covered by a perpetual agreement, so no contract is signed per stay. */
+  hasStandingContract: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -29,6 +31,7 @@ export type CustomerInput = {
   email: string | null;
   address: string | null;
   notes: string | null;
+  hasStandingContract: boolean;
 };
 
 /** Named weekend. `startDate` is check-in, `endDate` is check-out. */

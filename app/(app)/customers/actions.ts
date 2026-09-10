@@ -21,6 +21,7 @@ function readInput(formData: FormData) {
     email: text(formData, "email") || null,
     address: text(formData, "address") || null,
     notes: text(formData, "notes") || null,
+    hasStandingContract: formData.get("has_standing_contract") === "on",
   };
 }
 
