@@ -8,15 +8,14 @@ const INITIAL: CustomerFormState = { error: null, duplicates: [] };
 export default function NewCustomerForm() {
   const [state, formAction, pending] = useActionState(addCustomer, INITIAL);
 
-  return (
-    <form
-      action={formAction}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-    >
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-        Add a customer
-      </h3>
+  // Collapsed by default so the list is what you land on, but forced open when
+  // there is feedback to read, which would otherwise be hidden behind a summary.
+  const hasFeedback = Boolean(state.error) || state.duplicates.length > 0;
 
+  return (
+    <details open={hasFeedback} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <summary className="disclosure">Add a customer</summary>
+      <form action={formAction} className="mt-3">
       {state.error ? (
         <p className="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
           {state.error}
@@ -72,6 +71,7 @@ export default function NewCustomerForm() {
       <button type="submit" className="btn-primary mt-3" disabled={pending}>
         {pending ? "Saving..." : "Add customer"}
       </button>
-    </form>
+      </form>
+    </details>
   );
 }

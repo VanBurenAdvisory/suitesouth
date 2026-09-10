@@ -83,12 +83,12 @@ export default function BookingForm({
   return (
     <form
       action={formAction}
-      className="grid gap-6 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-start"
+      className="grid gap-5 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-start"
     >
       <input type="hidden" name="property_id" value={propertyId} />
       <input type="hidden" name="nights" value={nights} />
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {state.error ? (
           <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
             {state.error}
@@ -297,7 +297,7 @@ export default function BookingForm({
         </details>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <CalcPreview result={result} property={property} nights={nights} />
         <button type="submit" className="btn-primary" disabled={pending || !ready}>
           {pending ? "Saving..." : "Log stay"}

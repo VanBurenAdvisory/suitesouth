@@ -140,13 +140,9 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
         ) : null}
       </ul>
 
-      <form
-        action={addEvent}
-        className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-      >
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Add an event
-        </h3>
+      <details className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="disclosure">Add an event</summary>
+        <form action={addEvent} className="mt-3">
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="sm:col-span-2">
@@ -229,10 +225,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
           </div>
         </div>
 
-        <button type="submit" className="btn-primary mt-3">
-          Add event
-        </button>
-      </form>
+          <button type="submit" className="btn-primary mt-3">
+            Add event
+          </button>
+        </form>
+      </details>
     </main>
   );
 }

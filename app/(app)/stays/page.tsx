@@ -62,10 +62,11 @@ export default async function StaysPage({ searchParams }: { searchParams: Search
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
       <h2 className="mb-3 text-lg font-semibold text-slate-900">Stays</h2>
 
-      <form
-        method="get"
-        className="grid grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:grid-cols-4"
-      >
+      <details open={hasFilters} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="disclosure">
+          Filters{hasFilters ? " (active)" : ""}
+        </summary>
+        <form method="get" className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div>
           <label className="label" htmlFor="property">
             Condo
@@ -160,7 +161,8 @@ export default async function StaysPage({ searchParams }: { searchParams: Search
             </Link>
           ) : null}
         </div>
-      </form>
+        </form>
+      </details>
 
       <div className="mt-4">
         <TotalsBar totals={totals} showCoowner={showCoowner} />

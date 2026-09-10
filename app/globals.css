@@ -12,25 +12,37 @@ body {
 
 @layer components {
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-600;
+    @apply mb-1 block text-sm font-medium text-slate-600;
   }
 
-  /* text-lg keeps mobile Safari from zooming the viewport on focus. */
+  /*
+   * text-base is 16px, which is the threshold below which mobile Safari zooms
+   * the viewport on focus. Do not go smaller here; grow on wider screens only.
+   * py-2.5 with that size still clears a 44px touch target.
+   */
   .field {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-lg text-slate-900
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-base text-slate-900
            shadow-sm outline-none transition
            focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10
-           disabled:bg-slate-100 disabled:text-slate-500;
+           disabled:bg-slate-100 disabled:text-slate-500
+           sm:px-4 sm:py-3 sm:text-lg;
   }
 
   .btn-primary {
-    @apply w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition
+    @apply w-full rounded-xl bg-slate-900 px-5 py-3 text-base font-semibold text-white transition
            hover:bg-slate-800 active:bg-slate-950
-           disabled:cursor-not-allowed disabled:opacity-60;
+           disabled:cursor-not-allowed disabled:opacity-60
+           sm:py-3.5 sm:text-lg;
   }
 
   .btn-quiet {
     @apply rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700
            transition hover:bg-slate-50;
+  }
+
+  /* Collapsible section header used to keep long forms off the first screen. */
+  .disclosure {
+    @apply cursor-pointer list-none text-sm font-semibold uppercase tracking-wide text-slate-500
+           marker:content-[''];
   }
 }
