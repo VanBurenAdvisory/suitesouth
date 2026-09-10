@@ -1,4 +1,5 @@
 import DateRangeForm from "@/components/DateRangeForm";
+import EventSelectForm from "@/components/EventSelectForm";
 import { checkAvailability } from "@/lib/availability";
 import { money } from "@/lib/calc";
 import { addDays, formatRange, isValidDate, todayLocal } from "@/lib/dates";
@@ -41,27 +42,14 @@ export default async function AvailabilityPage({
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
       <div className="space-y-3">
         {events.length > 0 ? (
-          <form method="get" className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <label className="label" htmlFor="event">
-              Event
-            </label>
-            <div className="flex gap-2">
-              <select id="event" name="event" defaultValue={eventId} className="field">
-                <option value="">Choose an event</option>
-                {events.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.name} {e.year}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="btn-primary w-auto shrink-0 px-6">
-                Check
-              </button>
-            </div>
-          </form>
+          <EventSelectForm
+            events={events.map((e) => ({ id: e.id, name: e.name, year: e.year }))}
+            selectedId={eventId}
+          />
         ) : null}
 
-        <DateRangeForm checkIn={checkIn} checkOut={checkOut} />
+        {/* Keyed so a new event's dates land in the inputs, not the previous ones. */}
+        <DateRangeForm key={`${checkIn}-${checkOut}`} checkIn={checkIn} checkOut={checkOut} />
       </div>
 
       <div className="mt-6">
