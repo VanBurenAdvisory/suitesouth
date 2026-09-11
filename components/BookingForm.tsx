@@ -44,7 +44,6 @@ export default function BookingForm({
   const [taxAmount, setTaxAmount] = useState("");
   const [amountReceived, setAmountReceived] = useState("");
   const [paidDate, setPaidDate] = useState("");
-  const [notes, setNotes] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
   const computedNights = nightsBetween(checkIn, checkOut);
@@ -75,7 +74,6 @@ export default function BookingForm({
       setTaxAmount("");
       setAmountReceived("");
       setPaidDate("");
-      setNotes("");
       setConfirmed(false);
     }
   }, [state]);
@@ -191,7 +189,6 @@ export default function BookingForm({
           <div>
             <label className="label" htmlFor="room_revenue">
               Total revenue
-              <span className="ml-1.5 text-xs font-normal text-slate-400">whole stay</span>
             </label>
             <input
               id="room_revenue"
@@ -262,7 +259,7 @@ export default function BookingForm({
 
         <details className="rounded-xl border border-slate-200 bg-white px-4 py-3">
           <summary className="cursor-pointer text-sm font-medium text-slate-600">
-            Payment and notes
+            Payment
           </summary>
           <div className="mt-4 space-y-4">
             <div className="grid grid-cols-2 gap-3">
@@ -294,19 +291,6 @@ export default function BookingForm({
                   onChange={(e) => setPaidDate(e.target.value)}
                 />
               </div>
-            </div>
-            <div>
-              <label className="label" htmlFor="notes">
-                Notes
-              </label>
-              <textarea
-                id="notes"
-                name="notes"
-                rows={2}
-                className="field"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
             </div>
           </div>
         </details>
