@@ -257,16 +257,7 @@ export default function BookingForm({
             onChange={(e) => setConfirmed(e.target.checked)}
             className="mt-0.5 size-5 shrink-0 rounded border-slate-300"
           />
-          <span className="text-sm font-medium text-slate-800">
-            Confirmed
-            <span className="block text-xs font-normal text-slate-500">
-              Contract signed and paid in full
-              {confirmed && result.amountDue > 0
-                ? `, recording ${money(result.amountDue)} received`
-                : ""}
-              .
-            </span>
-          </span>
+          <span className="text-sm font-medium text-slate-800">Confirmed</span>
         </label>
 
         <details className="rounded-xl border border-slate-200 bg-white px-4 py-3">

@@ -23,7 +23,7 @@ export default function PropertyPicker({ properties, value, onChange }: Props) {
               onClick={() => onChange(property.id)}
               aria-pressed={selected}
               className={[
-                "rounded-xl border px-2 py-3 text-sm font-semibold leading-tight transition sm:text-base",
+                "rounded-xl border px-2 py-2 text-sm font-semibold leading-tight transition",
                 selected
                   ? "border-slate-900 bg-slate-900 text-white shadow-sm"
                   : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50",

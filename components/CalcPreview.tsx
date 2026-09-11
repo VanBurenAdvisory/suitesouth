@@ -10,6 +10,8 @@ type Props = {
   nights: number;
 };
 
+const pct = (n: number): string => `${Number(n.toFixed(2))}%`;
+
 function Line({
   label,
   value,
@@ -46,12 +48,7 @@ function Line({
   );
 }
 
-const pct = (n: number): string => `${Number(n.toFixed(2))}%`;
-
 export default function CalcPreview({ result, property, nights }: Props) {
-  const commissionRate = property
-    ? (property.ownerSharePct * property.commissionPct) / 100
-    : 0;
   const hasCoowner = Boolean(property && property.ownerSharePct < 100);
 
   return (
@@ -88,8 +85,7 @@ export default function CalcPreview({ result, property, nights }: Props) {
 
       <div className="mt-3 divide-y divide-slate-100 border-t border-slate-200 pt-2">
         <Line
-          label="Manager commission"
-          hint={property ? `${pct(commissionRate)} of subtotal` : undefined}
+          label="Management Fee"
           value={money(result.managerCommission)}
         />
         {result.managerFees > 0 ? (
