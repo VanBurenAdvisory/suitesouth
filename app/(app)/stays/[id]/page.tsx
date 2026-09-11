@@ -86,10 +86,7 @@ export default async function BookingDetailPage({
             <Row label="Stay revenue" value={money(booking.subtotal)} />
             <Row label="Per night, derived" value={money(booking.nightlyRate)} />
             {booking.fees > 0 ? <Row label="Fees" value={money(booking.fees)} /> : null}
-            <Row
-              label={`Manager commission, ${booking.ownerSharePct}% x ${booking.commissionPct}%`}
-              value={money(booking.managerCommission)}
-            />
+            <Row label="Management Fee" value={money(booking.managerCommission)} />
             <Row label="Owner due" value={money(booking.ownerDue)} />
             {booking.coownerDue > 0 ? (
               <Row label="Co-owner distribution" value={money(booking.coownerDue)} />
@@ -99,10 +96,6 @@ export default async function BookingDetailPage({
             <Row label="Received" value={money(booking.amountReceived)} />
             <Row label="Balance" value={money(balance)} />
           </div>
-          <p className="mt-3 text-xs text-slate-400">
-            Calculated from the rates stored on this booking, not the property's current
-            settings.
-          </p>
         </section>
 
         {/* Status tracks */}

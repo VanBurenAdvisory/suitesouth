@@ -293,11 +293,27 @@ export async function setInvoiceStatus(id: string, status: InvoiceStatus): Promi
               deposit_received_at = coalesce(deposit_received_at, now()), updated_at = now()
               where id = ${id}`;
   } else if (status === "paid_in_full") {
+    const balances = (await sql`
+      select b.amount_due - coalesce(sum(p.amount), 0) as balance
+      from bookings b
+      left join payments p on p.booking_id = b.id
+      where b.id = ${id}
+      group by b.id, b.amount_due
+    `) as Row[];
+    const balance = Number(balances[0]?.balance ?? 0);
+
     await sql`update bookings set invoice_status = 'paid_in_full',
               invoice_sent_at = coalesce(invoice_sent_at, now()),
               deposit_received_at = coalesce(deposit_received_at, now()),
               paid_in_full_at = coalesce(paid_in_full_at, now()), updated_at = now()
               where id = ${id}`;
+
+    if (balance > 0) {
+      await sql`
+        insert into payments (booking_id, amount, note)
+        values (${id}, ${balance}, 'Confirmed payment')
+      `;
+    }
   } else {
     await sql`update bookings set invoice_status = 'not_sent',
               invoice_sent_at = null, deposit_received_at = null, paid_in_full_at = null,
