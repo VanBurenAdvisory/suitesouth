@@ -29,15 +29,27 @@ export async function listCustomers(search?: string): Promise<Customer[]> {
   const rows = term
     ? ((await sql.query(
         `select ${COLUMNS} from customers
+         left join (
+           select customer_id, max(check_in) as last_stay
+           from bookings
+           group by customer_id
+         ) recent on recent.customer_id = customers.id
          where lower(first_name || ' ' || last_name) like $1
             or lower(last_name) like $1
             or coalesce(phone, '') like $2
-         order by last_name, first_name
+         order by recent.last_stay desc nulls last, last_name, first_name
          limit 50`,
         [`%${term.toLowerCase()}%`, `%${term}%`],
       )) as Row[])
     : ((await sql.query(
-        `select ${COLUMNS} from customers order by last_name, first_name limit 200`,
+        `select ${COLUMNS} from customers
+         left join (
+           select customer_id, max(check_in) as last_stay
+           from bookings
+           group by customer_id
+         ) recent on recent.customer_id = customers.id
+         order by recent.last_stay desc nulls last, last_name, first_name
+         limit 200`,
       )) as Row[]);
   return rows.map(toCustomer);
 }

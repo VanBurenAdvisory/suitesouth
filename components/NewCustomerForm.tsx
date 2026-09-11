@@ -16,7 +16,7 @@ export default function NewCustomerForm({ defaultOpen = false }: { defaultOpen?:
     <details
       id="add"
       open={defaultOpen || hasFeedback}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+      className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
     >
       <summary className="disclosure">Add a customer</summary>
       <form action={formAction} className="mt-3">
@@ -50,25 +50,25 @@ export default function NewCustomerForm({ defaultOpen = false }: { defaultOpen?:
           <label className="label" htmlFor="first_name">
             First name
           </label>
-          <input id="first_name" name="first_name" className="field" autoComplete="off" />
+          <input id="first_name" name="first_name" className="field py-2 text-sm sm:py-2 sm:text-sm" autoComplete="off" />
         </div>
         <div>
           <label className="label" htmlFor="last_name">
             Last name
           </label>
-          <input id="last_name" name="last_name" className="field" autoComplete="off" required />
+          <input id="last_name" name="last_name" className="field py-2 text-sm sm:py-2 sm:text-sm" autoComplete="off" required />
         </div>
         <div>
           <label className="label" htmlFor="phone">
             Phone
           </label>
-          <input id="phone" name="phone" inputMode="tel" className="field" />
+          <input id="phone" name="phone" inputMode="tel" className="field py-2 text-sm sm:py-2 sm:text-sm" />
         </div>
         <div>
           <label className="label" htmlFor="email">
             Email
           </label>
-          <input id="email" name="email" type="email" className="field" />
+          <input id="email" name="email" type="email" className="field py-2 text-sm sm:py-2 sm:text-sm" />
         </div>
       </div>
 

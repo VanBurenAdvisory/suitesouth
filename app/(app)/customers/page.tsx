@@ -31,30 +31,29 @@ export default async function CustomersPage({ searchParams }: { searchParams: Se
         </a>
       </div>
 
-      <form method="get" className="flex gap-2">
+      <form method="get" className="flex items-center gap-2">
         <input
           name="q"
           defaultValue={query}
           placeholder="Search name or phone"
-          className="field"
+          className="field py-2 text-sm sm:py-2 sm:text-sm"
           aria-label="Search customers"
         />
-        <button type="submit" className="btn-primary w-auto shrink-0 px-6">
+        <button type="submit" className="btn-add w-auto">
           Search
         </button>
       </form>
 
-      <ul className="mt-4 space-y-2">
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
         {customers.map((c) => (
           <li key={c.id}>
             <Link
               href={`/customers/${c.id}`}
-              className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm hover:border-slate-300"
+              className="flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm hover:border-slate-300"
             >
               <span className="font-medium text-slate-900">
                 {c.firstName ? `${c.firstName} ${c.lastName}` : c.lastName}
               </span>
-              <span className="text-sm text-slate-500">{c.phone ?? c.email ?? ""}</span>
             </Link>
           </li>
         ))}
