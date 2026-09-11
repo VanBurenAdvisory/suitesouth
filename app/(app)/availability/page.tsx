@@ -40,7 +40,7 @@ export default async function AvailabilityPage({
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <div className="space-y-3">
+      <div className="space-y-2">
         {events.length > 0 ? (
           <EventSelectForm
             events={events.map((e) => ({ id: e.id, name: e.name, year: e.year }))}
@@ -52,7 +52,7 @@ export default async function AvailabilityPage({
         <DateRangeForm key={`${checkIn}-${checkOut}`} checkIn={checkIn} checkOut={checkOut} />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-4">
         <p className="text-sm text-slate-500">
           {formatRange(checkIn, checkOut)}
           {event ? (
@@ -61,34 +61,43 @@ export default async function AvailabilityPage({
             </span>
           ) : null}
         </p>
-        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+        <p className="mt-0.5 text-xl font-bold tracking-tight text-slate-900">
           {openCount} of {results.length} open
         </p>
       </div>
 
-      <ul className="mt-4 space-y-3">
+      <ul className="mt-3 space-y-2">
         {results.map(({ property, available, conflicts, suggestedRate, rateSource, priorYears }) => (
-          <li
-            key={property.id}
-            className={`rounded-2xl border p-4 shadow-sm ${
-              available ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white"
-            }`}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-lg font-bold text-slate-900">{property.name}</p>
-                <p
-                  className={`text-sm font-semibold ${
-                    available ? "text-emerald-700" : "text-slate-500"
-                  }`}
-                >
-                  {available ? "Available" : "Blocked"}
+          <li key={property.id} className={`rounded-2xl border p-3 shadow-sm ${
+            available
+              ? "border-emerald-200 bg-emerald-50"
+              : conflicts.some((c) => c.state === "confirmed")
+                ? "border-red-200 bg-red-50"
+                : "border-yellow-200 bg-yellow-50"
+          }`}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <p className="truncate text-base font-bold text-slate-900">{property.name}</p>
+                <p className={`shrink-0 text-sm font-semibold ${
+                  available
+                    ? "text-emerald-700"
+                    : conflicts.some((c) => c.state === "confirmed")
+                      ? "text-red-700"
+                      : "text-yellow-800"
+                }`}>
+                  {available
+                    ? "Available"
+                    : conflicts.some((c) => c.state === "confirmed")
+                      ? "Confirmed"
+                      : conflicts[0]?.state === "hold"
+                        ? "Hold"
+                        : "Blocked"}
                 </p>
               </div>
 
               {available && suggestedRate !== null ? (
                 <div className="shrink-0 text-right">
-                  <p className="text-2xl font-bold tabular-nums text-slate-900">
+                  <p className="text-xl font-bold tabular-nums text-slate-900">
                     {money(suggestedRate)}
                   </p>
                   <p className="text-xs text-slate-500">
@@ -99,7 +108,7 @@ export default async function AvailabilityPage({
             </div>
 
             {!available ? (
-              <ul className="mt-3 space-y-1 border-t border-slate-100 pt-3 text-sm text-slate-600">
+              <ul className="mt-2 space-y-1 border-t border-slate-200/70 pt-2 text-sm text-slate-600">
                 {conflicts.map((c) => (
                   <li key={c.bookingId}>
                     {c.customerName}, {formatRange(c.checkIn, c.checkOut)}
@@ -110,7 +119,7 @@ export default async function AvailabilityPage({
             ) : null}
 
             {priorYears.length > 0 ? (
-              <div className="mt-3 border-t border-slate-100 pt-3">
+              <div className="mt-2 border-t border-slate-200/70 pt-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   Charged before
                 </p>

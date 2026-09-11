@@ -19,7 +19,7 @@ export default function EventSelectForm({
     <form
       ref={formRef}
       method="get"
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+      className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
     >
       <label className="label" htmlFor="event">
         Event
@@ -29,7 +29,7 @@ export default function EventSelectForm({
         name="event"
         defaultValue={selectedId}
         onChange={() => formRef.current?.requestSubmit()}
-        className="field"
+        className="field py-2 text-sm sm:py-2 sm:text-sm"
       >
         <option value="">Choose an event</option>
         {events.map((e) => (

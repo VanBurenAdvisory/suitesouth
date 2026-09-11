@@ -19,8 +19,8 @@ export default function DateRangeForm({
   const [checkOut, setCheckOut] = useState(initialCheckOut);
 
   return (
-    <form method="get" className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="grid grid-cols-2 gap-3">
+    <form method="get" className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="grid grid-cols-2 gap-2">
         <div>
           <label className="label" htmlFor="from">
             Check-in
@@ -29,7 +29,7 @@ export default function DateRangeForm({
             id="from"
             name="from"
             type="date"
-            className="field"
+            className="field py-2 text-sm sm:py-2 sm:text-sm"
             value={checkIn}
             onChange={(e) => {
               const value = e.target.value;
@@ -46,14 +46,14 @@ export default function DateRangeForm({
             id="to"
             name="to"
             type="date"
-            className="field"
+            className="field py-2 text-sm sm:py-2 sm:text-sm"
             min={checkIn || undefined}
             value={checkOut}
             onChange={(e) => setCheckOut(e.target.value)}
           />
         </div>
       </div>
-      <button type="submit" className="btn-primary mt-3">
+      <button type="submit" className="btn-primary mt-2 py-2 text-sm sm:py-2 sm:text-sm">
         Check these dates
       </button>
     </form>
